@@ -1,6 +1,6 @@
 {
   "name": "validate-types",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Validate object properties against type schema",
   "author": {
     "email": "dbrekalo@gmail.com",
