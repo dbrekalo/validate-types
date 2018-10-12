@@ -10,7 +10,7 @@
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dbrekalo/type-factory"
+    "url": "https://github.com/dbrekalo/validate-types"
   },
   "scripts": {
     "watch": "grunt",
