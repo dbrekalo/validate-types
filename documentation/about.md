@@ -1,12 +1,8 @@
-# Validate types
-
-[![Build Status](https://travis-ci.org/dbrekalo/validate-types.svg?branch=master)](https://travis-ci.org/dbrekalo/validate-types)
-[![NPM Status](https://img.shields.io/npm/v/validate-types.svg)](https://www.npmjs.com/package/validate-types)
-
-Validate object properties using simple schema.
-Works in browser or server side. Packs no dependencies and weighs less than 2KB.
-
-[Documentation and examples](http://dbrekalo.github.io/validate-types/).
+# About
+- set expectations for valid property types, check against native (String, Number, Boolean, Array, Object, Date, Function...) or custom constructors.
+- mark properties as required or provide default values.
+- run custom validation for each property.
+- extend validator with custom tests or create your own validator.
 
 ## Install
 ```
@@ -63,5 +59,3 @@ console.log(result);
    undeclaredFields: {}
 }
 ```
-
-[Documentation and examples](http://dbrekalo.github.io/validate-types/).

@@ -1,5 +1,5 @@
-var assert = require("chai").assert;
-var validateTypes = require("../");
+var assert = require('chai').assert;
+var validateTypes = require('../index.js');
 
 describe('Validate types', function() {
 
@@ -13,7 +13,7 @@ describe('Validate types', function() {
 
         assert.deepEqual(
             validateTypes(schema).errors,
-            [{key: 'title', message: 'Prop "title" is required'}]
+            [{test: 'required', field: 'title', message: 'Field "title" is required'}]
         );
 
         assert.isTrue(
@@ -42,7 +42,7 @@ describe('Validate types', function() {
 
         assert.deepEqual(
             validateTypes({title: String}, {title: 42}).errors,
-            [{key: 'title', message: 'Prop "title" is of invalid type'}]
+            [{test: 'type', field: 'title', message: 'Field "title" is of invalid type'}]
         );
 
         assert.isFalse(
@@ -116,7 +116,7 @@ describe('Validate types', function() {
         );
 
         assert.isFalse(
-            validateTypes(schema, {data: [1,2]}).hasErrors
+            validateTypes(schema, {data: [1, 2]}).hasErrors
         );
 
     });
@@ -178,25 +178,52 @@ describe('Validate types', function() {
 
     });
 
-    it('disallows direct object or array default props', function() {
+    it('extracts schema defaults', function() {
+
+        var schema = {
+            title: {default: 'Test'},
+            published: {default: true},
+            tags: {default: function() { return []; }},
+            age: Number
+        };
 
         assert.deepEqual(
-            validateTypes({
-                tags: {default: []},
-                params: {default: {}}
-            }).errors,
-            [
-                {key: 'tags', message: 'Object or array prop not allowed for "tags". Use factory function.'},
-                {key: 'params', message: 'Object or array prop not allowed for "params". Use factory function.'}
-            ]
+            validateTypes.extractDefaults(schema),
+            {title: 'Test', published: true, tags: []}
+        );
+
+    });
+
+    it('defaults merging can be disabled', function() {
+
+        var schema = {
+            title: {type: String, default: 'Test'},
+            published: {default: true},
+            age: {default: 18}
+        };
+
+        assert.deepEqual(
+            validateTypes(schema, {published: false}, {assignDefaults: false}).data,
+            {published: false}
+        );
+
+    });
+
+    it('returns undeclared fields', function() {
+
+        var schema = {
+            title: {type: String, default: 'Test'},
+        };
+
+        var input = {age: 14, text: 'foo'};
+
+        assert.isTrue(
+            validateTypes(schema, input).hasUndeclaredFields
         );
 
         assert.deepEqual(
-            validateTypes({
-                tags: {default: function() { return [1, 2]; }},
-                params: {default: function() { return {foo: 'bar'}; }}
-            }).data,
-            {tags: [1, 2], params: {foo: 'bar'}}
+            validateTypes(schema, input).undeclaredFields,
+            input
         );
 
     });
@@ -206,6 +233,7 @@ describe('Validate types', function() {
         var schema = {
             title: {
                 type: String,
+                required: true,
                 validator: function(value) { return value.length > 2; }
             }
         };
@@ -216,7 +244,7 @@ describe('Validate types', function() {
 
         assert.deepEqual(
             validateTypes(schema, {title: 'F'}).errors,
-            [{key: 'title', message: 'Prop "title" failed to pass validator check'}]
+            [{test: 'validator', field: 'title', message: 'Field "title" failed validation'}]
         );
 
         assert.isFalse(
@@ -225,6 +253,101 @@ describe('Validate types', function() {
 
         assert.isTrue(
             validateTypes(schema, {title: 1234}).hasErrors
+        );
+
+    });
+
+    it('new validator with custom tests can be created', function() {
+
+        var validate = validateTypes.createValidator();
+
+        validate.addTest({
+            name: 'minLength',
+            validate: function(params) {
+                return params.fieldValue.length >= params.testConfig;
+            },
+            message: function(params) {
+                return 'Field "' + params.fieldName + '" must have ' + params.testConfig + ' charters minimum';
+            }
+        });
+
+        var schema = {
+            title: {
+                type: String,
+                required: true,
+                minLength: 4
+            }
+        };
+
+        assert.equal(validate.getTest('minLength').name, 'minLength');
+
+        assert.deepEqual(
+            validate(schema).errors,
+            [{test: 'required', field: 'title', message: 'Field "title" is required'}]
+        );
+
+        assert.deepEqual(
+            validate(schema, {title: 1234}).errors,
+            [{test: 'type', field: 'title', message: 'Field "title" is of invalid type'}]
+        );
+
+        assert.deepEqual(
+            validate(schema, {title: 'Foo'}).errors,
+            [{test: 'minLength', field: 'title', message: 'Field "title" must have 4 charters minimum'}]
+        );
+
+        assert.isFalse(
+            validate(schema, {title: 'Foobar'}).hasErrors
+        );
+
+        validate.removeTest('minLength');
+        assert.isUndefined(validate.getTest('minLength'));
+
+    });
+
+    it('test message can be customized', function() {
+
+        var validate = validateTypes.createValidator();
+        var schema = {title: String};
+
+        validate.setTestMessage('type', 'foo');
+
+        assert.equal(
+            validate(schema, {title: 123}).errors[0].message,
+            'foo'
+        );
+
+        validate.setTestMessage('type', function(params) {
+            return [params.fieldName, params.fieldValue].join(' ');
+        });
+
+        assert.equal(
+            validate(schema, {title: 123}).errors[0].message,
+            'title 123'
+        );
+
+        assert.deepEqual(
+            validate(schema, {title: 123}, {
+                messages: {
+                    title: {
+                        type: 'bar'
+                    }
+                }
+            }).errors[0].message,
+            'bar'
+        );
+
+    });
+
+    it('validates single value', function() {
+
+        assert.deepEqual(
+            validateTypes.validateValue(123, {type: String}),
+            {hasErrors: true, errors: [{test: 'type'}]}
+        );
+
+        assert.isFalse(
+            validateTypes.validateValue('Test', {type: String}).hasErrors
         );
 
     });

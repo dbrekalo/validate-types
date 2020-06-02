@@ -1,4 +1,14 @@
+.DS_Store
 node_modules/
 coverage/
-*.orig
+.nyc_output/
 npm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.orig
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
