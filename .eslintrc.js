@@ -54,4 +54,4 @@ module.exports = {
     'space-in-parens': ['error'],
     'wrap-iife': 'error'
   }
-}
+};
