@@ -1,6 +1,7 @@
 # Api and examples
 
 ## Type validation
+Each object field can be validated against single or multiple native types.
 ```js
 const validateTypes = require('validate-types');
 
@@ -22,8 +23,19 @@ const result = validateTypes(schema, {
     name: 123
 });
 ```
+Custom constructors can also be added to schema (internally checked using instanceof operator).
+```js
+const MyCustomType = function() {};
+
+const schema = {
+    name: {
+        type: MyCustomType
+    }
+};
+````
 
 ## Validation result
+Validation output is object with properties examined bellow.
 ```js
 {
     // did validation pass?
@@ -46,6 +58,7 @@ const result = validateTypes(schema, {
 ```
 
 ## Undeclared fields
+Fields in input object not defined in schema will be reported as undeclared fields in validation output.
 ```js
 const schema = {firstName: String};
 const result = validateTypes(schema, {
@@ -69,6 +82,7 @@ const result = validateTypes(schema, {
 ````
 
 ## Required fields
+Fields can be marked as required when input is mandatory.
 ```js
 const schema = {
     firstName: {
@@ -84,6 +98,7 @@ validateTypes(schema, {
 ````
 
 ## Field defaults
+Default field values can be defined and used when user input is not required.
 ```js
 const schema = {
     title: String,
@@ -124,6 +139,7 @@ validateTypes.extractDefaults(schema);
 ````
 
 ## Custom validator test
+Field value can be validated inline with custom validator logic.
 ```js
 const schema = {
     age: {
@@ -140,6 +156,7 @@ validateTypes(schema, {
 ````
 
 ## Changing error messages
+Default validation output messages can be replaced with custom ones.
 ```js
 const schema = {
     title: {
@@ -168,6 +185,7 @@ validateTypes.setTestMessage('type', function({fieldName}) {
 ````
 
 ## Adding tests
+Custom tests can be added to extend validator functionality.
 ```js
 validateTypes.addTest({
     name: 'minLength',
@@ -178,25 +196,25 @@ validateTypes.addTest({
         return `Field "${fieldName}"" min length is ${minLength} characters`;
     }
 });
-// following will produce "minLength" error
-validateTypes({
+const schema = {
     title: {
         type: String,
         minLength: 4
     }
-}, {
-    title: 'Foo'
-}).hasErrors === true;
+};
+// following will produce "minLength" error
+validateTypes(schema, {title: 'Foo'});
 ```
-**Validate and message function** are called with following params:
+**Validate and message function** are called with following parameters:
 - ```fieldValue```: current field value being tested (String ```'Foo'``` in example above)
-- ```fieldName``` field name in input / schema (```'title'``` in example)
-- ```fieldSchema``` field name in input / schema (```{type: String, minLength: 4}``` in example)
-- ```testConfig``` test config value (number ```4``` in example)
+- ```fieldName```: field name in input / schema (```'title'``` in example)
+- ```fieldSchema```: current field schema (```{type: String, minLength: 4}``` in example)
+- ```testConfig```: test config value (number ```4``` in example)
 - ```input```: complete input object (```{title: 'Foo'}```)
 - ```schema```: complete schema object  (```{title: {type: String, minLength: 4}}```)
+- ```validator```: current validator instance
 
-Tests can be configured to stop further value tests:
+Test can be configured to skip further field value tests:
 ```js
 validateTypes.addTest({
     name: 'foo',
@@ -213,29 +231,42 @@ validateTypes.addTest({
 - ```validateResult```: result of validate function
 - rest of parameters identical to validate and message functions
 
+**Test position in test stack** can be set when adding tests:
+```js
+const nullableTest = require('validate-types/tests/nullable');
+const minLengthTest = require('validate-types/tests/min-length');
+
+validateTypes.addTest(readOnlyTest, {insertAfter: 'required'});
+validateTypes.addTest(minLengthTest, {insertBefore: 'validator'});
+```
+
 ## Creating validators
 New validators can be created to produce isolated validator instances.
 Tests added or customized on created instance will not affect main validator or other validator instances.
 ```js
-var myValidator = validateTypes.createValidator();
+const myValidator = validateTypes.createValidator();
 // will create new validator instance with "required, type and validator tests"
 ```
 Customize validator instance tests like in example bellow
 (test order is important, validator will run tests in same order as they were defined):
 ```js
-var myValidator = validateTypes.createValidator([
-    validateTypes.getTest('required'),
-    validateTypes.getTest('type'),
-    {
-        name: 'minLength',
-        validate: ({fieldValue, testConfig: minLength}) => {
-            return fieldValue.length >= minLength;
-        },
-        message: ({fieldName, testConfig: minLength}) => {
-            return `Field "${fieldName}"" min length is ${minLength} characters`;
-        }
-    },
-    validateTypes.getTest('validator'),
+const requiredTest = require('validate-types/tests/required');
+const typeTest = require('validate-types/tests/type');
+const validatorTest = require('validate-types/tests/validator');
+const myTest = require('./my-test');
+
+const myValidator = validateTypes.createValidator([
+    requiredTest,
+    typeTest,
+    myTest,
+    validatorTest
 ]);
-myValidator.addTest({...});
 ```
+
+## Validating single values
+Single values can also be validated using field schema:
+```js
+validateTypes.validateValue('foo', {
+    type: [String, Number]
+})
+````

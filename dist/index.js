@@ -4,46 +4,21 @@
     (global = global || self, global.validateTypes = factory());
 }(this, (function () { 'use strict';
 
-    function getIncludedTests() {
-        return [
-            {
-                name: 'required',
-                validate: function(params) {
-                    var isRequired = Boolean(params.testConfig);
-                    var fieldValue = params.fieldValue;
-                    return isRequired && typeof fieldValue !== 'undefined';
-                },
-                message: function(params) {
-                    return 'Field "' + params.fieldName + '" is required';
-                },
-                skipFurtherTests: function(params) {
-                    return !params.validateResult;
-                },
-                testUndefinedValues: true,
-            },
-            {
-                name: 'type',
-                validate: function(params) {
-                    return isValidType(params.fieldValue, params.testConfig);
-                },
-                message: function(params) {
-                    return 'Field "' + params.fieldName + '" is of invalid type';
-                },
-                skipFurtherTests: function(params) {
-                    return !params.validateResult;
-                }
-            },
-            {
-                name: 'validator',
-                validate: function(params) {
-                    return Boolean(params.testConfig(params.fieldValue));
-                },
-                message: function(params) {
-                    return 'Field "' + params.fieldName + '" failed validation';
-                }
-            }
-        ];
-    }
+    var required = {
+        name: 'required',
+        validate: function(params) {
+            return params.testConfig
+                ? typeof params.fieldValue !== 'undefined'
+                : true;
+        },
+        message: function(params) {
+            return 'Field "' + params.fieldName + '" is required';
+        },
+        skipFurtherTests: function(params) {
+            return !params.validateResult;
+        },
+        testUndefinedValues: true
+    };
 
     function isValidSingleType(value, Type) {
 
@@ -76,7 +51,7 @@
 
         if (Array.isArray(Type)) {
             var isValid = false;
-            for (var i = 0; i < Type.length; i++) {
+            for (var i = 0, size = Type.length; i < size; i++) {
                 if (isValidSingleType(value, Type[i])) {
                     isValid = true;
                     break;
@@ -89,26 +64,55 @@
 
     }
 
-    function isPlainObject(obj) {
+    var type = {
+        name: 'type',
+        validate: function(params) {
+            return isValidType(params.fieldValue, params.testConfig);
+        },
+        message: function(params) {
+            return 'Field "' + params.fieldName + '" is of invalid type';
+        },
+        skipFurtherTests: function(params) {
+            return !params.validateResult;
+        }
+    };
+
+    var each = function each(arrayObj, callback) {
+        for (var i = 0, size = arrayObj.length; i < size; i++) {
+            if (callback(arrayObj[i], i) === false) {
+                break;
+            }
+        }
+    };
+
+    var isPlainObject = function isPlainObject(obj) {
         return Boolean(obj) === true &&
             typeof obj === 'object' &&
             obj.constructor === Object;
-    }
+    };
 
-    function assign(target, source) {
+    var assign = function assign(target, source) {
         Object.keys(source).forEach(function(key) {
             target[key] = source[key];
         });
         return target;
-    }
+    };
 
-    function each(arrayObj, callback) {
-        for (var i = 0; i < arrayObj.length; i++) {
-            if (callback(arrayObj[i]) === false) {
-                break;
-            }
+    var validator = {
+        name: 'validator',
+        validate: function(params) {
+            return Boolean(params.testConfig(params.fieldValue));
+        },
+        message: function(params) {
+            return 'Field "' + params.fieldName + '" failed validation';
         }
-    }
+    };
+
+    var includedTests = [
+        required,
+        type,
+        validator
+    ];
 
     function createValidator(testCollection) {
 
@@ -153,7 +157,8 @@
                         fieldSchema: fieldSchema,
                         testConfig: testConfig,
                         input: input,
-                        schema: schema
+                        schema: schema,
+                        validator: validator
                     };
                     var validateResult = args.validateResult = test.validate(args);
                     if (!validateResult) {
@@ -198,9 +203,31 @@
             };
         };
 
-        validator.addTest = function(config) {
-            testMap[config.name] = config;
-            testArray.push(config);
+        validator.addTest = function(config, params) {
+            var test = assign({}, config);
+            var refTestName = params && (params.insertAfter || params.insertBefore);
+
+            if (refTestName) {
+                var refPosition = -1;
+                each(testArray, function(testConfig, index) {
+                    if (testConfig.name === refTestName) {
+                        refPosition = index;
+                        return false;
+                    }
+                });
+                if (refPosition >= 0) {
+                    testArray.splice(params.insertAfter
+                        ? refPosition + 1
+                        : refPosition,
+                    0, test);
+                } else {
+                    throw new Error('Test "' + refTestName + '" not found');
+                }
+            } else {
+                testArray.push(test);
+            }
+
+            testMap[test.name] = test;
             return validator;
         };
 
@@ -254,9 +281,13 @@
             return data;
         };
 
+        validator.clone = function() {
+            return createValidator(testArray);
+        };
+
         validator.createValidator = createValidator;
 
-        (testCollection || getIncludedTests()).forEach(function(test) {
+        (testCollection || includedTests).forEach(function(test) {
             validator.addTest(test);
         });
 

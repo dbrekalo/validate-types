@@ -1,7 +1,7 @@
 # About
-- set expectations for valid property types, check against native (String, Number, Boolean, Array, Object, Date, Function...) or custom constructors.
-- mark properties as required or provide default values.
-- run custom validation for each property.
+- set expectations for valid object field types, check against native (String, Number, Boolean, Array, Object, Date, Function...) or custom constructors.
+- mark required fields and provide default values.
+- run custom validation on each field.
 - extend validator with custom tests or create your own validator.
 
 ## Install
@@ -23,7 +23,6 @@ const schema = {
         type: String,
         required: true
     },
-    address: String,
     zipCode: [String, Number],
     age: {
         type: Number,

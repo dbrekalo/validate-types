@@ -1,5 +1,9 @@
 var assert = require('chai').assert;
 var validateTypes = require('../index.js');
+var allTests = require('../tests/all.js');
+var minLengthTest = require('../tests/min-length.js');
+var nullableTest = require('../tests/nullable.js');
+var readOnlyTest = require('../tests/read-only.js');
 
 describe('Validate types', function() {
 
@@ -259,27 +263,27 @@ describe('Validate types', function() {
 
     it('new validator with custom tests can be created', function() {
 
-        var validate = validateTypes.createValidator();
-
-        validate.addTest({
-            name: 'minLength',
-            validate: function(params) {
-                return params.fieldValue.length >= params.testConfig;
-            },
-            message: function(params) {
-                return 'Field "' + params.fieldName + '" must have ' + params.testConfig + ' charters minimum';
-            }
-        });
+        var validate = validateTypes.createValidator()
+            .addTest(minLengthTest)
+            .addTest(readOnlyTest, {insertAfter: 'required'})
+            .addTest(nullableTest, {insertBefore: 'type'});
 
         var schema = {
             title: {
                 type: String,
                 required: true,
+                nullable: true,
                 minLength: 4
+            },
+            name: {
+                type: String,
+                readOnly: true
             }
         };
 
         assert.equal(validate.getTest('minLength').name, 'minLength');
+        assert.equal(validate.getTest('nullable').name, 'nullable');
+        assert.equal(validate.getTest('readOnly').name, 'readOnly');
 
         assert.deepEqual(
             validate(schema).errors,
@@ -291,9 +295,18 @@ describe('Validate types', function() {
             [{test: 'type', field: 'title', message: 'Field "title" is of invalid type'}]
         );
 
+        assert.isFalse(
+            validate(schema, {title: null}).hasErrors
+        );
+
         assert.deepEqual(
             validate(schema, {title: 'Foo'}).errors,
-            [{test: 'minLength', field: 'title', message: 'Field "title" must have 4 charters minimum'}]
+            [{test: 'minLength', field: 'title', message: 'Field "title" minimal length is 4'}]
+        );
+
+        assert.deepEqual(
+            validate(schema, {title: 'Foobar', name: 123}).errors,
+            [{test: 'readOnly', field: 'name', message: 'Field "name" is read only'}]
         );
 
         assert.isFalse(
@@ -348,6 +361,294 @@ describe('Validate types', function() {
 
         assert.isFalse(
             validateTypes.validateValue('Test', {type: String}).hasErrors
+        );
+
+    });
+
+});
+
+describe('Additional tests', function() {
+
+    var validate = validateTypes.createValidator(allTests);
+
+    it('validates read only test', function() {
+
+        var schema = {
+            foo: {readOnly: true}
+        };
+
+        assert.isFalse(
+            validate(schema, {}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 'bar'}).errors,
+            [{test: 'readOnly', field: 'foo', message: 'Field "foo" is read only'}]
+        );
+
+    });
+
+    it('validates nullable test', function() {
+
+        var schema = {
+            foo: {type: String, nullable: true}
+        };
+
+        var schemaNotNullable = {
+            foo: {type: String, nullable: false}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 'bar'}).hasErrors
+        );
+
+        assert.isFalse(
+            validate(schema, {foo: null}).hasErrors
+        );
+
+        assert.isTrue(
+            validate(schemaNotNullable, {foo: null}).hasErrors
+        );
+
+        assert.isTrue(
+            validate(schema, {foo: 123}).hasErrors
+        );
+
+    });
+
+    it('validates pattern test', function() {
+
+        var schema = {
+            foo: {type: String, pattern: /^foo/}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 'foobar'}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 'bar'}).errors,
+            [{test: 'pattern', field: 'foo', message: 'Field "foo" does not match required pattern'}]
+        );
+
+    });
+
+    it('validates min and max length test', function() {
+
+        var schema = {
+            foo: {type: String, minLength: 2, maxLength: 10}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 'foobar'}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 'f'}).errors,
+            [{test: 'minLength', field: 'foo', message: 'Field "foo" minimal length is 2'}]
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 'foobar-foobar'}).errors,
+            [{test: 'maxLength', field: 'foo', message: 'Field "foo" maximum length is 10'}]
+        );
+
+    });
+
+    it('validates integer test', function() {
+
+        var schema = {
+            foo: {type: Number, integer: true}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 42}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 42.5}).errors,
+            [{test: 'integer', field: 'foo', message: 'Field "foo" is not integer'}]
+        );
+
+    });
+
+    it('validates min and max test', function() {
+
+        var schema = {
+            foo: {type: Number, min: 0, max: 100}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 42}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: -1}).errors,
+            [{test: 'min', field: 'foo', message: 'Field "foo" minimal value is 0'}]
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 101}).errors,
+            [{test: 'max', field: 'foo', message: 'Field "foo" maximum value is 100'}]
+        );
+
+    });
+
+    it('validates equals test', function() {
+
+        var schema = {
+            foo: {type: String, equals: 'bar'}
+        };
+
+        assert.isFalse(
+            validate(schema, {foo: 'bar'}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {foo: 'test'}).errors,
+            [{test: 'equals', field: 'foo', message: 'Field "foo" does not equal expected value'}]
+        );
+
+    });
+
+    it('validates equals field test', function() {
+
+        var schema = {
+            password: {type: String, equalsField: 'repeatPassword'},
+            repeatPassword: String
+        };
+
+        assert.isFalse(
+            validate(schema, {
+                password: '123',
+                repeatPassword: '123'
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {
+                password: '123',
+                repeatPassword: '1234'
+            }).errors,
+            [{test: 'equalsField', field: 'password', message: 'Field "password" does not equal field "repeatPassword"'}]
+        );
+
+    });
+
+    it('validates one of test', function() {
+
+        var schema = {
+            title: {
+                type: String,
+                oneOf: ['foo', 'bar']
+            }
+        };
+
+        assert.isFalse(
+            validate(schema, {title: 'foo'}).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {title: 'test'}).errors,
+            [{test: 'oneOf', field: 'title', message: 'Field "title" does not equal any of predefined values'}]
+        );
+
+    });
+
+    it('validates object schema test', function() {
+
+        var schema = {
+            config: {
+                type: Object,
+                objectSchema: {
+                    port: Number,
+                    url: String
+                }
+            }
+        };
+
+        assert.isFalse(
+            validate(schema, {
+                config: {port: 3000, url: '/'}
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {
+                config: {port: false, url: '/'}
+            }).errors,
+            [{test: 'objectSchema', field: 'config', message: 'Field "config" has invalid fields'}]
+        );
+
+    });
+
+    it('validates email test', function() {
+
+        var schema = {
+            username: {
+                type: String,
+                email: true
+            }
+        };
+
+        assert.isFalse(
+            validate(schema, {
+                username: 'test@mail.com'
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {
+                username: 'test'
+            }).errors,
+            [{test: 'email', field: 'username', message: 'Field "username" is not valid email'}]
+        );
+
+    });
+
+    it('validates array schema test', function() {
+
+        var stringSchema = {
+            userList: {
+                type: Array,
+                arraySchema: String
+            }
+        };
+
+        assert.isFalse(
+            validate(stringSchema, {
+                userList: ['test@mail.com']
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(stringSchema, {
+                userList: ['test@mail.com', 1]
+            }).errors,
+            [{test: 'arraySchema', field: 'userList', message: 'Field "userList" is not valid array'}]
+        );
+
+        var objectSchema = {
+            userList: {
+                type: Array,
+                arraySchema: {
+                    fullName: String,
+                    age: Number
+                }
+            }
+        };
+
+        assert.isFalse(
+            validate(objectSchema, {
+                userList: [{fullName: 'John Doe', age: 17}]
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(objectSchema, {
+                userList: [{fullName: 'John Doe', age: '17'}]
+            }).errors,
+            [{test: 'arraySchema', field: 'userList', message: 'Field "userList" is not valid array'}]
         );
 
     });

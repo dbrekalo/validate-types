@@ -1,0 +1,19 @@
+module.exports = [
+    require('./required.js'),
+    require('./read-only.js'),
+    require('./nullable.js'),
+    require('./type.js'),
+    require('./equals.js'),
+    require('./equalsField.js'),
+    require('./email.js'),
+    require('./oneOf.js'),
+    require('./object-schema.js'),
+    require('./array-schema.js'),
+    require('./pattern.js'),
+    require('./max-length.js'),
+    require('./min-length.js'),
+    require('./integer.js'),
+    require('./min.js'),
+    require('./max.js'),
+    require('./validator.js')
+];

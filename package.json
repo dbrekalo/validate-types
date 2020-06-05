@@ -7,7 +7,7 @@
     "name": "Damir Brekalo"
   },
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/dbrekalo/validate-types"
@@ -17,10 +17,10 @@
     "docs:build": "vuepress build documentation",
     "build": "npm run build:lib && npm run docs:build",
     "build:lib": "rollup --config",
-    "lint": "eslint index.js test/index.js --color",
+    "lint": "eslint index.js tests/** spec/index.spec.js --color",
     "test": "npm run lint && npm run test:lib",
-    "test:lib": "nyc --reporter=lcov mocha ./test/index.js",
-    "watch:test:lib": "nyc --reporter=lcov mocha -w ./test/index.js"
+    "test:lib": "nyc mocha ./spec/index.spec.js",
+    "watch:test:lib": "nyc mocha -w ./spec/index.spec.js"
   },
   "keywords": [
     "validate",
@@ -35,10 +35,19 @@
     "eslint-plugin-standard": "^4.0.1",
     "mocha": "^7.2.0",
     "nyc": "^15.0.1",
-    "rollup": "^2.11.2",
+    "rollup": "^2.13.1",
     "rollup-plugin-terser": "^6.1.0",
-    "vuepress": "^1.5.0",
-    "watchpack": "^1.6.1"
+    "vuepress": "^1.5.0"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "nyc": {
+    "reporter": "lcov",
+    "include": [
+      "index.js",
+      "tests/**/*.js"
+    ],
+    "exclude": [
+      "**/*.spec.js"
+    ]
+  }
 }

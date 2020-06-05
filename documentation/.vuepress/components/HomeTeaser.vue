@@ -5,7 +5,7 @@
                 <div class="textTeaser">
                     <h2 class="title">Schema based data validation for javascript</h2>
                     <p class="text">
-                        Validate object properties using simple schema.
+                        Validate object fields using simple schema.
                         Works in browser or server side. Packs no dependencies and weighs less than 2KB.
                     </p>
                     <router-link class="ctaBtn" :to="'/about.html'">View documentation</router-link>

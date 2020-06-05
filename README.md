@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/dbrekalo/validate-types.svg?branch=master)](https://travis-ci.org/dbrekalo/validate-types)
 [![NPM Status](https://img.shields.io/npm/v/validate-types.svg)](https://www.npmjs.com/package/validate-types)
 
-Validate object properties using simple schema.
+Validate object fields using simple schema.
 Works in browser or server side. Packs no dependencies and weighs less than 2KB.
 
 [Documentation and examples](http://dbrekalo.github.io/validate-types/).

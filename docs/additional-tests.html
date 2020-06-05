@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Additional tests | Validate types</title>
+    <meta name="generator" content="VuePress 1.5.0">
+    
+    <meta name="description" content="Schema based data validation for javascript">
+    <link rel="preload" href="/validate-types/assets/css/0.styles.9c5e3bcf.css" as="style"><link rel="preload" href="/validate-types/assets/js/app.43ee6f48.js" as="script"><link rel="preload" href="/validate-types/assets/js/2.d7a5263f.js" as="script"><link rel="preload" href="/validate-types/assets/js/8.e0abef9d.js" as="script"><link rel="prefetch" href="/validate-types/assets/js/3.5185988e.js"><link rel="prefetch" href="/validate-types/assets/js/4.dd7ca8d9.js"><link rel="prefetch" href="/validate-types/assets/js/5.2f1b41f0.js"><link rel="prefetch" href="/validate-types/assets/js/6.2736c505.js"><link rel="prefetch" href="/validate-types/assets/js/7.fbb2cab0.js"><link rel="prefetch" href="/validate-types/assets/js/9.6434f91f.js">
+    <link rel="stylesheet" href="/validate-types/assets/css/0.styles.9c5e3bcf.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container"><header class="navbar"><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/validate-types/" class="home-link router-link-active"><!----> <span class="site-name">Validate types</span></a> <div class="links"><div class="search-box"><input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/validate-types/about.html" class="nav-link">
+  Documentation
+</a></div><div class="nav-item"><a href="https://github.com/dbrekalo/validate-types" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <!----></nav></div></header> <div class="sidebar-mask"></div> <aside class="sidebar"><nav class="nav-links"><div class="nav-item"><a href="/validate-types/about.html" class="nav-link">
+  Documentation
+</a></div><div class="nav-item"><a href="https://github.com/dbrekalo/validate-types" target="_blank" rel="noopener noreferrer" class="nav-link external">
+  Github
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg></a></div> <!----></nav>  <ul class="sidebar-links"><li><a href="/validate-types/about.html" class="sidebar-link">About</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/validate-types/about.html#install" class="sidebar-link">Install</a></li><li class="sidebar-sub-header"><a href="/validate-types/about.html#usage-example" class="sidebar-link">Usage example</a></li></ul></li><li><a href="/validate-types/api-and-examples.html" class="sidebar-link">Api and examples</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#type-validation" class="sidebar-link">Type validation</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#validation-result" class="sidebar-link">Validation result</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#undeclared-fields" class="sidebar-link">Undeclared fields</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#required-fields" class="sidebar-link">Required fields</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#field-defaults" class="sidebar-link">Field defaults</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#custom-validator-test" class="sidebar-link">Custom validator test</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#changing-error-messages" class="sidebar-link">Changing error messages</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#adding-tests" class="sidebar-link">Adding tests</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#creating-validators" class="sidebar-link">Creating validators</a></li><li class="sidebar-sub-header"><a href="/validate-types/api-and-examples.html#validating-single-values" class="sidebar-link">Validating single values</a></li></ul></li><li><a href="/validate-types/additional-tests.html" aria-current="page" class="active sidebar-link">Additional tests</a><ul class="sidebar-sub-headers"><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#min-length" class="sidebar-link">Min length</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#max-length" class="sidebar-link">Max length</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#pattern" class="sidebar-link">Pattern</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#email" class="sidebar-link">Email</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#equals" class="sidebar-link">Equals</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#equals-field" class="sidebar-link">Equals field</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#one-of" class="sidebar-link">One of</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#integer" class="sidebar-link">Integer</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#max" class="sidebar-link">Max</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#min" class="sidebar-link">Min</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#nullable" class="sidebar-link">Nullable</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#read-only" class="sidebar-link">Read-only</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#object-schema" class="sidebar-link">Object schema</a></li><li class="sidebar-sub-header"><a href="/validate-types/additional-tests.html#array-schema" class="sidebar-link">Array schema</a></li></ul></li></ul> </aside> <main class="page"> <div class="theme-default-content content__default"><h1 id="additional-tests"><a href="#additional-tests" class="header-anchor">#</a> Additional tests</h1> <p>Core library bundles only <code>required</code>, <code>type</code> and <code>validator</code> tests to keep things fast and simple.
+Additional test can be pulled from library to your validator.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> validateTypes <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'validate-types'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> minLengthTest <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'validate-types/tests/min-length'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+validateTypes<span class="token punctuation">.</span><span class="token function">addTest</span><span class="token punctuation">(</span>minLengthTest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><p>All available additional tests can be loaded and used like in example bellow:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> validateTypes <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'validate-types'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> allTests <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'validate-types/tests/all'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> validator <span class="token operator">=</span> validateTypes<span class="token punctuation">.</span><span class="token function">createValidator</span><span class="token punctuation">(</span>allTests<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="min-length"><a href="#min-length" class="header-anchor">#</a> Min length</h2> <p>Validate field minimal expected length.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        minLength<span class="token operator">:</span> <span class="token number">3</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="max-length"><a href="#max-length" class="header-anchor">#</a> Max length</h2> <p>Validate field maximum expected length.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        maxLength<span class="token operator">:</span> <span class="token number">33</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="pattern"><a href="#pattern" class="header-anchor">#</a> Pattern</h2> <p>Validate strings using regular expression tests.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        pattern<span class="token operator">:</span> <span class="token regex">/^foo/</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="email"><a href="#email" class="header-anchor">#</a> Email</h2> <p>Validate if field value is valid email.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    username<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        email<span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><p>Update email pattern if needed:</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">var</span> emailTest <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'validate-types/tests/email'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+emailTest<span class="token punctuation">.</span><span class="token function">setPattern</span><span class="token punctuation">(</span>customRE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="equals"><a href="#equals" class="header-anchor">#</a> Equals</h2> <p>Validate if field value equals expected value.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        equals<span class="token operator">:</span> <span class="token string">'foo'</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="equals-field"><a href="#equals-field" class="header-anchor">#</a> Equals field</h2> <p>Validate if field value equals another fields value.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    password<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        equalsField<span class="token operator">:</span> <span class="token string">'repeatPassword'</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    repeatPassword<span class="token operator">:</span> String
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="one-of"><a href="#one-of" class="header-anchor">#</a> One of</h2> <p>Validate if field value equals one of predefined values.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    status<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Number<span class="token punctuation">,</span>
+        oneOf<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="integer"><a href="#integer" class="header-anchor">#</a> Integer</h2> <p>Validate if field value is integer.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Number<span class="token punctuation">,</span>
+        integer<span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="max"><a href="#max" class="header-anchor">#</a> Max</h2> <p>Validate maximum field value.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Number<span class="token punctuation">,</span>
+        max<span class="token operator">:</span> <span class="token number">100</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="min"><a href="#min" class="header-anchor">#</a> Min</h2> <p>Validate minimum field value.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Number<span class="token punctuation">,</span>
+        min<span class="token operator">:</span> <span class="token number">0</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="nullable"><a href="#nullable" class="header-anchor">#</a> Nullable</h2> <p>Allow fields to have <code>null</code> as value regardless of declared type.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    title<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Object<span class="token punctuation">,</span>
+        nullable<span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="read-only"><a href="#read-only" class="header-anchor">#</a> Read-only</h2> <p>Report fields as read only when received in validation input.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    orderStatus<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> String<span class="token punctuation">,</span>
+        readOnly<span class="token operator">:</span> <span class="token boolean">true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="object-schema"><a href="#object-schema" class="header-anchor">#</a> Object schema</h2> <p>Validate object fields against validation schema.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token keyword">const</span> schema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    config<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Object<span class="token punctuation">,</span>
+        objectSchema<span class="token operator">:</span> <span class="token punctuation">{</span>
+            port<span class="token operator">:</span> Number<span class="token punctuation">,</span>
+            url<span class="token operator">:</span> String
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div><h2 id="array-schema"><a href="#array-schema" class="header-anchor">#</a> Array schema</h2> <p>Validate object fields against validation schema.</p> <div class="language-js extra-class"><pre class="language-js"><code><span class="token comment">// example dataset {userList: ['john', 'peter']};</span>
+<span class="token keyword">const</span> stringArraySchema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    userList<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Array<span class="token punctuation">,</span>
+        arraySchema<span class="token operator">:</span> String
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token comment">// example dataset {userList: [{name: 'john', age: 17}]};</span>
+<span class="token keyword">const</span> objectArraySchema <span class="token operator">=</span> <span class="token punctuation">{</span>
+    userList<span class="token operator">:</span> <span class="token punctuation">{</span>
+        type<span class="token operator">:</span> Array<span class="token punctuation">,</span>
+        arraySchema<span class="token operator">:</span> <span class="token punctuation">{</span>
+            name<span class="token operator">:</span> String<span class="token punctuation">,</span>
+            age<span class="token operator">:</span> Number
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+</code></pre></div></div> <footer class="page-edit"><!----> <!----></footer> <div class="page-nav"><p class="inner"><span class="prev">
+      ←
+      <a href="/validate-types/api-and-examples.html" class="prev">
+        Api and examples
+      </a></span> <!----></p></div> </main></div><div class="global-ui"></div></div>
+    <script src="/validate-types/assets/js/app.43ee6f48.js" defer></script><script src="/validate-types/assets/js/2.d7a5263f.js" defer></script><script src="/validate-types/assets/js/8.e0abef9d.js" defer></script>
+  </body>
+</html>

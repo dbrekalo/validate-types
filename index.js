@@ -1,108 +1,15 @@
-function getIncludedTests() {
-    return [
-        {
-            name: 'required',
-            validate: function(params) {
-                var isRequired = Boolean(params.testConfig);
-                var fieldValue = params.fieldValue;
-                return isRequired && typeof fieldValue !== 'undefined';
-            },
-            message: function(params) {
-                return 'Field "' + params.fieldName + '" is required';
-            },
-            skipFurtherTests: function(params) {
-                return !params.validateResult;
-            },
-            testUndefinedValues: true,
-        },
-        {
-            name: 'type',
-            validate: function(params) {
-                return isValidType(params.fieldValue, params.testConfig);
-            },
-            message: function(params) {
-                return 'Field "' + params.fieldName + '" is of invalid type';
-            },
-            skipFurtherTests: function(params) {
-                return !params.validateResult;
-            }
-        },
-        {
-            name: 'validator',
-            validate: function(params) {
-                return Boolean(params.testConfig(params.fieldValue));
-            },
-            message: function(params) {
-                return 'Field "' + params.fieldName + '" failed validation';
-            }
-        }
-    ];
-}
+var requiredTest = require('./tests/required.js');
+var typeTest = require('./tests/type.js');
+var each = require('./lib/each');
+var isPlainObject = require('./lib/is-plain-object');
+var assign = require('./lib/assign');
+var validatorTest = require('./tests/validator.js');
 
-function isValidSingleType(value, Type) {
-
-    var isValid = false;
-    var valueType = typeof value;
-
-    var checkType = function(type) {
-        isValid = valueType === type;
-    };
-
-    switch (Type) {
-        case String: checkType('string'); break;
-        case Number: checkType('number'); break;
-        case Boolean: checkType('boolean'); break;
-        case Function: checkType('function'); break;
-        case Array:
-            isValid = Array.isArray(value);
-            break;
-        case Object:
-            isValid = valueType === 'object' && value !== null && !Array.isArray(value);
-            break;
-        default:
-            isValid = value instanceof Type;
-    }
-    return isValid;
-
-}
-
-function isValidType(value, Type) {
-
-    if (Array.isArray(Type)) {
-        var isValid = false;
-        for (var i = 0; i < Type.length; i++) {
-            if (isValidSingleType(value, Type[i])) {
-                isValid = true;
-                break;
-            }
-        }
-        return isValid;
-    } else {
-        return isValidSingleType(value, Type);
-    }
-
-}
-
-function isPlainObject(obj) {
-    return Boolean(obj) === true &&
-        typeof obj === 'object' &&
-        obj.constructor === Object;
-}
-
-function assign(target, source) {
-    Object.keys(source).forEach(function(key) {
-        target[key] = source[key];
-    });
-    return target;
-}
-
-function each(arrayObj, callback) {
-    for (var i = 0; i < arrayObj.length; i++) {
-        if (callback(arrayObj[i]) === false) {
-            break;
-        }
-    }
-}
+var includedTests = [
+    requiredTest,
+    typeTest,
+    validatorTest
+];
 
 function createValidator(testCollection) {
 
@@ -147,7 +54,8 @@ function createValidator(testCollection) {
                     fieldSchema: fieldSchema,
                     testConfig: testConfig,
                     input: input,
-                    schema: schema
+                    schema: schema,
+                    validator: validator
                 };
                 var validateResult = args.validateResult = test.validate(args);
                 if (!validateResult) {
@@ -192,9 +100,31 @@ function createValidator(testCollection) {
         };
     };
 
-    validator.addTest = function(config) {
-        testMap[config.name] = config;
-        testArray.push(config);
+    validator.addTest = function(config, params) {
+        var test = assign({}, config);
+        var refTestName = params && (params.insertAfter || params.insertBefore);
+
+        if (refTestName) {
+            var refPosition = -1;
+            each(testArray, function(testConfig, index) {
+                if (testConfig.name === refTestName) {
+                    refPosition = index;
+                    return false;
+                }
+            });
+            if (refPosition >= 0) {
+                testArray.splice(params.insertAfter
+                    ? refPosition + 1
+                    : refPosition,
+                0, test);
+            } else {
+                throw new Error('Test "' + refTestName + '" not found');
+            }
+        } else {
+            testArray.push(test);
+        }
+
+        testMap[test.name] = test;
         return validator;
     };
 
@@ -248,9 +178,13 @@ function createValidator(testCollection) {
         return data;
     };
 
+    validator.clone = function() {
+        return createValidator(testArray);
+    };
+
     validator.createValidator = createValidator;
 
-    (testCollection || getIncludedTests()).forEach(function(test) {
+    (testCollection || includedTests).forEach(function(test) {
         validator.addTest(test);
     });
 
