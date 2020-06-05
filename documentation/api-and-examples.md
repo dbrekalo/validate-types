@@ -81,6 +81,11 @@ const result = validateTypes(schema, {
 }
 ````
 
+Undeclared fields can be reported as errors:
+```js
+validateTypes.reportUndeclaredAsError(true);
+````
+
 ## Required fields
 Fields can be marked as required when input is mandatory.
 ```js
@@ -260,7 +265,13 @@ const myValidator = validateTypes.createValidator([
     typeTest,
     myTest,
     validatorTest
-]);
+], {
+    reportUndeclaredAsError: true,
+    messages: {
+        required: 'Field is required',
+        type: 'Field has invalid type'
+    }
+});
 ```
 
 ## Validating single values

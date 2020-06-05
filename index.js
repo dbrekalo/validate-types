@@ -1,9 +1,10 @@
-var requiredTest = require('./tests/required.js');
-var typeTest = require('./tests/type.js');
+var requiredTest = require('./tests/required');
+var typeTest = require('./tests/type');
 var each = require('./lib/each');
 var isPlainObject = require('./lib/is-plain-object');
 var assign = require('./lib/assign');
-var validatorTest = require('./tests/validator.js');
+var result = require('./lib/result');
+var validatorTest = require('./tests/validator');
 
 var includedTests = [
     requiredTest,
@@ -11,10 +12,20 @@ var includedTests = [
     validatorTest
 ];
 
-function createValidator(testCollection) {
+function createValidator(testCollection, validatorParams) {
+
+    testCollection = testCollection || includedTests;
+    validatorParams = validatorParams || {};
 
     var testArray = [];
     var testMap = {};
+
+    var undeclaredIsError = Boolean(
+        validatorParams.reportUndeclaredAsError
+    );
+    var undeclaredErrorMessage = function(params) {
+        return 'Field "' + params.fieldName + '" is not declared';
+    };
 
     var validator = function(schema, input, overrrides) {
 
@@ -28,9 +39,7 @@ function createValidator(testCollection) {
         var validateField = function(fieldName, fieldSchema) {
             var defaultValue = overrrides.assignDefaults === false
                 ? undefined
-                : (typeof fieldSchema.default === 'function'
-                    ? fieldSchema.default()
-                    : fieldSchema.default);
+                : result(fieldSchema.default);
             var fieldValue = typeof input[fieldName] !== 'undefined'
                 ? input[fieldName]
                 : defaultValue;
@@ -48,6 +57,7 @@ function createValidator(testCollection) {
                 if (fieldValueIsUndefined && !test.testUndefinedValues) {
                     return;
                 }
+                var childErrors = null;
                 var args = {
                     fieldValue: fieldValue,
                     fieldName: fieldName,
@@ -55,7 +65,11 @@ function createValidator(testCollection) {
                     testConfig: testConfig,
                     input: input,
                     schema: schema,
-                    validator: validator
+                    validator: validator,
+                    addChildError: function(error) {
+                        childErrors = childErrors || [];
+                        childErrors.push(error);
+                    }
                 };
                 var validateResult = args.validateResult = test.validate(args);
                 if (!validateResult) {
@@ -63,13 +77,15 @@ function createValidator(testCollection) {
                         overrrides.messages[fieldName] &&
                         overrrides.messages[fieldName][test.name] ||
                         test.message;
-                    errors.push({
+                    var fieldError = {
                         field: fieldName,
                         test: test.name,
-                        message: typeof message === 'function'
-                            ? message(args)
-                            : message
-                    });
+                        message: result(message, args)
+                    };
+                    if (childErrors) {
+                        fieldError.errors = childErrors;
+                    }
+                    errors.push(fieldError);
                 }
                 if (test.skipFurtherTests && test.skipFurtherTests(args)) {
                     return false;
@@ -88,6 +104,17 @@ function createValidator(testCollection) {
         Object.keys(input).forEach(function(key) {
             if (!schema[key]) {
                 undeclaredFields[key] = input[key];
+                undeclaredIsError && errors.push({
+                    field: key,
+                    test: 'undeclared',
+                    message: result(undeclaredErrorMessage, {
+                        fieldName: key,
+                        fieldValue: input[key],
+                        input: input,
+                        schema: schema,
+                        validator: validator
+                    })
+                });
             }
         });
 
@@ -103,6 +130,10 @@ function createValidator(testCollection) {
     validator.addTest = function(config, params) {
         var test = assign({}, config);
         var refTestName = params && (params.insertAfter || params.insertBefore);
+
+        if (testMap[config.name]) {
+            validator.removeTest(config.name);
+        }
 
         if (refTestName) {
             var refPosition = -1;
@@ -143,8 +174,12 @@ function createValidator(testCollection) {
             : undefined;
     };
 
-    validator.setTestMessage = function(name, message) {
-        validator.getTest(name, true).message = message;
+    validator.setTestMessage = function(testName, message) {
+        if (testName === 'undeclared') {
+            undeclaredErrorMessage = message;
+        } else {
+            validator.getTest(testName, true).message = message;
+        }
         return validator;
     };
 
@@ -167,9 +202,7 @@ function createValidator(testCollection) {
                 : undefined;
             var defaultValueType = typeof defaultValue;
             if (defaultValueType !== 'undefined') {
-                var value = defaultValueType === 'function'
-                    ? defaultValue()
-                    : defaultValue;
+                var value = result(defaultValue);
                 if (typeof value !== 'undefined') {
                     data[key] = value;
                 }
@@ -179,13 +212,25 @@ function createValidator(testCollection) {
     };
 
     validator.clone = function() {
-        return createValidator(testArray);
+        return createValidator(testArray, {
+            reportUndeclaredAsError: undeclaredIsError,
+            messages: {undeclared: undeclaredErrorMessage}
+        });
+    };
+
+    validator.reportUndeclaredAsError = function(isError) {
+        undeclaredIsError = isError;
+        return validator;
     };
 
     validator.createValidator = createValidator;
 
-    (testCollection || includedTests).forEach(function(test) {
+    testCollection.forEach(function(test) {
         validator.addTest(test);
+    });
+
+    Object.keys(validatorParams.messages || {}).forEach(function(testName) {
+        validator.setTestMessage(testName, validatorParams.messages[testName]);
     });
 
     return validator;

@@ -232,6 +232,17 @@ describe('Validate types', function() {
 
     });
 
+    it('reports undeclared fields as errors', function() {
+
+        var validator = validateTypes.clone().reportUndeclaredAsError(true);
+
+        assert.deepEqual(
+            validator({}, {age: 17}).errors,
+            [{test: 'undeclared', field: 'age', message: 'Field "age" is not declared'}]
+        );
+
+    });
+
     it('type checks props with custom validator', function() {
 
         var schema = {
@@ -315,6 +326,10 @@ describe('Validate types', function() {
 
         validate.removeTest('minLength');
         assert.isUndefined(validate.getTest('minLength'));
+
+        assert.throws(function() {
+            validate.addTest({name: 'required'}, {insertAfter: 'foo'});
+        });
 
     });
 
@@ -555,33 +570,6 @@ describe('Additional tests', function() {
 
     });
 
-    it('validates object schema test', function() {
-
-        var schema = {
-            config: {
-                type: Object,
-                objectSchema: {
-                    port: Number,
-                    url: String
-                }
-            }
-        };
-
-        assert.isFalse(
-            validate(schema, {
-                config: {port: 3000, url: '/'}
-            }).hasErrors
-        );
-
-        assert.deepEqual(
-            validate(schema, {
-                config: {port: false, url: '/'}
-            }).errors,
-            [{test: 'objectSchema', field: 'config', message: 'Field "config" has invalid fields'}]
-        );
-
-    });
-
     it('validates email test', function() {
 
         var schema = {
@@ -606,6 +594,42 @@ describe('Additional tests', function() {
 
     });
 
+    it('validates object schema test', function() {
+
+        var schema = {
+            config: {
+                type: Object,
+                objectSchema: {
+                    port: Number,
+                    url: String
+                }
+            }
+        };
+
+        assert.isFalse(
+            validate(schema, {
+                config: {port: 3000, url: '/'}
+            }).hasErrors
+        );
+
+        assert.deepEqual(
+            validate(schema, {
+                config: {port: false, url: '/'}
+            }).errors,
+            [{
+                test: 'objectSchema',
+                field: 'config',
+                message: 'Field "config" has invalid fields',
+                errors: [{
+                    test: 'type',
+                    field: 'port',
+                    message: 'Field "port" is of invalid type'
+                }]
+            }]
+        );
+
+    });
+
     it('validates array schema test', function() {
 
         var stringSchema = {
@@ -625,7 +649,15 @@ describe('Additional tests', function() {
             validate(stringSchema, {
                 userList: ['test@mail.com', 1]
             }).errors,
-            [{test: 'arraySchema', field: 'userList', message: 'Field "userList" is not valid array'}]
+            [{
+                test: 'arraySchema',
+                field: 'userList',
+                message: 'Field "userList" is not valid array',
+                errors: [{
+                    test: 'type',
+                    field: '[1]'
+                }]
+            }]
         );
 
         var objectSchema = {
@@ -648,7 +680,16 @@ describe('Additional tests', function() {
             validate(objectSchema, {
                 userList: [{fullName: 'John Doe', age: '17'}]
             }).errors,
-            [{test: 'arraySchema', field: 'userList', message: 'Field "userList" is not valid array'}]
+            [{
+                test: 'arraySchema',
+                field: 'userList',
+                message: 'Field "userList" is not valid array',
+                errors: [{
+                    test: 'type',
+                    field: '[0].age',
+                    message: 'Field "age" is of invalid type'
+                }]
+            }]
         );
 
     });
