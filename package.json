@@ -12,6 +12,11 @@
     "type": "git",
     "url": "https://github.com/dbrekalo/validate-types"
   },
+  "files": [
+    "/dist",
+    "/tests",
+    "/lib"
+  ],
   "scripts": {
     "docs:dev": "vuepress dev documentation",
     "docs:build": "vuepress build documentation",
