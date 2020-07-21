@@ -42,7 +42,7 @@
     "nyc": "^15.0.1",
     "rollup": "^2.13.1",
     "rollup-plugin-terser": "^6.1.0",
-    "vuepress": "^1.5.0"
+    "vuepress": "^1.5.2"
   },
   "dependencies": {},
   "nyc": {
